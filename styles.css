@@ -1,0 +1,654 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #6200ea;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+nav button {
+  background-color: #3700b3;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+nav button:hover {
+  background-color: #7c4dff;
+}
+
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-box button {
+  padding: 10px 20px;
+  background-color: #6200ea;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.search-box button:hover {
+  background-color: #7c4dff;
+}
+
+#searchResults, #practiceQuestion, #practiceOptions {
+  margin-top: 20px;
+}
+
+#practiceOptions button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: #ddd;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#practiceOptions button:hover {
+  background-color: #ccc;
+}
+
+#feedback {
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+/* Search Results Styling */
+/* Hide search results initially */
+#searchResults {
+  display: none;
+  margin-top: 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Show search results when active */
+#searchResults.active {
+  display: block;
+}
+
+#searchResults h3 {
+  font-size: 24px;
+  color: #1a0dab;
+  margin-bottom: 16px;
+}
+
+.part-of-speech {
+  margin-bottom: 20px;
+}
+
+.part-of-speech h4 {
+  font-size: 18px;
+  color: #202124;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.part-of-speech .meaning {
+  margin-bottom: 8px;
+  color: #4d5156;
+}
+
+.part-of-speech .meaning strong {
+  color: #202124;
+}
+
+.part-of-speech .meaning em {
+  display: block;
+  color: #70757a;
+  margin-top: 4px;
+}
+
+.part-of-speech p {
+  margin-top: 8px;
+  color: #4d5156;
+}
+
+.part-of-speech p strong {
+  color: #202124;
+}
+/* Button Styling */
+.button {
+  background-color: #6200ea;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 5px 0;
+}
+
+.button:hover {
+  background-color: #7c4dff;
+}
+
+/* File Input Styling */
+.file-input {
+  display: none; /* Hide the default file input */
+}
+
+.file-label {
+  background-color: #6200ea;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 5px 0;
+  display: inline-block;
+}
+
+.file-label:hover {
+  background-color: #7c4dff;
+}
+/* Input Field Styling */
+#hoursSinceLastAsked {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+
+
+/* Practice Section Styling */
+#practice {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#practice h2 {
+  color: #6200ea;
+  margin-bottom: 20px;
+}
+
+#practice div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+#practice label {
+  flex: 1;
+  text-align: right;
+  margin-right: 15px;
+  font-size: 16px;
+  color: #333;
+  white-space: nowrap;
+}
+
+#practice input,
+#practice select {
+  flex: 2;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* #practice button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #6200ea;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#practice button:hover {
+  background-color: #7c4dff;
+} */
+
+#practice input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+#practiceQuestion {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+#practiceOptions {
+  display: flex;
+  flex-direction: column;
+  /* gap: 10px; Adds spacing between buttons */
+}
+
+#practiceOptions button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#practiceOptions button:hover {
+  background-color: #ddd;
+}
+
+#practiceOptions button.correct {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+#practiceOptions button.incorrect {
+  background-color: #f44336; /* Red */
+  color: white;
+}
+
+#feedback {
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#correctAnswerDetails {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+#correctAnswerDetails h4 {
+  color: #6200ea;
+  margin-bottom: 10px;
+}
+
+#correctAnswerDetails p {
+  font-size: 16px;
+  color: #333;
+}
+
+#nextButton {
+  margin-top: 20px;
+  background-color: #6200ea;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  /* transition: background-color 0.3s ease; */
+}
+
+#nextButton:hover {
+  background-color: #7c4dff;
+}
+/* Dropdown Styling */
+#questionType {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  margin: 10px 0;
+  
+  background-color: white;
+  cursor: pointer;
+}
+
+/* Config Box Styling */
+.config-box {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Spacing between elements */
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Input Fields Styling */
+.config-box input {
+  width: 80%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: white;
+}
+
+/* Dictionary Group Styling */
+.dict-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.dict-group label {
+  font-size: 16px;
+  color: #333;
+  white-space: nowrap;
+  flex: 1;
+  text-align: right;
+}
+
+.dict-group select {
+  flex: 2;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: white;
+  cursor: pointer;
+}
+/* Input Group Styling */
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Labels for API Keys */
+.input-group label {
+  font-size: 16px;
+  color: #333;
+  white-space: nowrap;
+  flex: 1;
+  text-align: right;
+}
+
+/* Input Fields */
+.input-group input {
+  flex: 2;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: white;
+}
+
+
+label {
+  display: inline-flex;
+  font-size: 16px;
+  color: #333;
+  margin-right: 20px;
+} 
+
+/* Search Results Styling */
+/* #searchResults {
+  display: none;
+  margin-top: 20px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#searchResults.active {
+  display: block;
+}
+
+#searchResults h3 {
+  font-size: 24px;
+  color: #1a0dab;
+  margin-bottom: 16px;
+}
+
+.part-of-speech {
+  margin-bottom: 20px;
+}
+
+.part-of-speech h4 {
+  font-size: 18px;
+  color: #202124;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.part-of-speech .meaning {
+  margin-bottom: 8px;
+  color: #4d5156;
+}
+
+.part-of-speech .meaning strong {
+  color: #202124;
+}
+
+.part-of-speech .meaning em {
+  display: block;
+  color: #70757a;
+  margin-top: 4px;
+}
+
+.part-of-speech p {
+  margin-top: 8px;
+  color: #4d5156;
+}
+
+.part-of-speech p strong {
+  color: #202124;
+}
+
+
+.definitions-card {
+  margin-bottom: 20px;
+}
+
+.definitions-card h2 {
+  font-size: 18px;
+  color: #6200ea;
+  margin-bottom: 12px;
+}
+
+.definitions-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.definition-item {
+  margin-bottom: 10px;
+  color: #4d5156;
+}
+
+.definition-number {
+  font-weight: bold;
+  color: #202124;
+  margin-right: 8px;
+}
+
+
+.synonyms-card, .antonyms-card {
+  margin-bottom: 20px;
+}
+
+.synonyms-card h2, .antonyms-card h2 {
+  font-size: 18px;
+  color: #6200ea;
+  margin-bottom: 12px;
+}
+
+.synonym-group, .antonym-group {
+  margin-bottom: 12px;
+}
+
+.group-title {
+  font-weight: bold;
+  color: #202124;
+}
+
+.synonym-list, .antonym-list {
+  color: #4d5156;
+}
+
+
+.examples-card {
+  margin-bottom: 20px;
+}
+
+.examples-card h2 {
+  font-size: 18px;
+  color: #6200ea;
+  margin-bottom: 12px;
+}
+
+.example-item {
+  margin-bottom: 10px;
+}
+
+.example-text {
+  font-style: italic;
+  color: #70757a;
+}
+
+.example-number {
+  font-weight: bold;
+  color: #202124;
+  margin-right: 8px;
+} */
+ /* Word Title */
+.word-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1a0dab;
+  margin-bottom: 8px;
+}
+
+/* Part of Speech */
+.part-of-speech {
+  font-size: 1.1rem;
+  color: #666;
+  font-style: italic;
+  margin-bottom: 16px;
+}
+
+/* Definitions */
+.definitions {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #1a0dab;
+  margin-bottom: 12px;
+}
+
+.definitions-list {
+  list-style-type: decimal;
+  padding-left: 24px;
+  margin-bottom: 16px;
+}
+
+.definition-item {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.definition-text {
+  line-height: 1.6;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Examples */
+.example-item {
+  font-size: 1rem;
+  color: #666;
+  margin-left: 20px;
+  margin-bottom: 8px;
+}
+
+.example-text {
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.example-text b {
+  font-weight: bold;
+  color: #1a0dab;
+}
+
+/* Synonyms */
+.synonyms {
+  margin-bottom: 24px;
+}
+
+.synonyms-list {
+  list-style-type: disc;
+  padding-left: 24px;
+  margin-bottom: 16px;
+}
+
+.synonym-group {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.synonym-text {
+  line-height: 1.6;
+}
