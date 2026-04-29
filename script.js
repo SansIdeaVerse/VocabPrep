@@ -635,20 +635,24 @@ function saveWord(entry) {
       return;
     }
   
-    // Get the delay value from the input field
+    // Get the delay value from the input field (in hours)
     const hoursSinceLastAskedInput = document.getElementById('hoursSinceLastAsked');
     const hoursSinceLastAskedValue = parseFloat(hoursSinceLastAskedInput.value) || 0;
     localStorage.setItem('hoursSinceLastAsked', hoursSinceLastAskedValue);
+    
     // Get the selected question type
     const questionType = document.getElementById('questionType').value;
   
-    // Filter words based on priority and time delay
+    // Filter words based on delay time
     const now = Date.now();
     const wordsToPractice = wordData.filter(entry => {
       const wordPriority = priority[entry.word];
-      if (!wordPriority.lastAsked) return true; // Never asked before
+      // If never asked, include it
+      if (!wordPriority || !wordPriority.lastAsked) return true;
+      // Calculate hours since last asked
       const hoursSinceLastAsked = (now - wordPriority.lastAsked) / (1000 * 60 * 60);
-      return hoursSinceLastAsked >= hoursSinceLastAskedValue; // Use the user-specified delay
+      // Only include if enough time has passed
+      return hoursSinceLastAsked >= hoursSinceLastAskedValue;
     });
   
     if (wordsToPractice.length === 0) {
@@ -656,16 +660,15 @@ function saveWord(entry) {
       return;
     }
   
-    // Sort words by priority (higher priority first)
-    const sortedWords = wordsToPractice.sort((a, b) => priority[b.word].value - priority[a.word].value);
-    const wordEntry = sortedWords[0];
+    // Pick a random word from the filtered list
+    const wordEntry = wordsToPractice[Math.floor(Math.random() * wordsToPractice.length)];
   
     // Determine the question type
     let isSynonym;
     if (questionType === 'random') {
-      isSynonym = Math.random() > 0.5; // Randomly choose between synonym and antonym
+      isSynonym = Math.random() > 0.5;
     } else {
-      isSynonym = questionType === 'synonym'; // Use the selected type
+      isSynonym = questionType === 'synonym';
     }
   
     // Get the correct answer based on the question type
@@ -678,20 +681,37 @@ function saveWord(entry) {
       return;
     }
   
-    // Generate options (1 correct + 3 random)
+    // Generate options (1 correct + 3 random from other words' synonyms/antonyms)
     const options = [correctAnswer];
+    let otherWords = wordData.filter(w => w.word !== wordEntry.word);
+    
+    while (options.length < 4 && otherWords.length > 0) {
+      const randomWord = otherWords[Math.floor(Math.random() * otherWords.length)];
+      const allRelatedWords = [...(randomWord.synonyms || []), ...(randomWord.antonyms || [])];
+      if (allRelatedWords.length > 0) {
+        const randomOption = allRelatedWords[Math.floor(Math.random() * allRelatedWords.length)];
+        if (!options.includes(randomOption) && randomOption !== correctAnswer) {
+          options.push(randomOption);
+        }
+      }
+      otherWords = otherWords.filter(w => w.word !== randomWord.word);
+    }
+    
+    // If we don't have enough options, fill with random words
     while (options.length < 4) {
-      const randomOption = wordData[Math.floor(Math.random() * wordData.length)].word;
-      if (!options.includes(randomOption) && randomOption!==wordEntry.word){
-        options.push(randomOption);
-      } else {
-        // If the random option is already in the list, skip it
-        continue;
+      const randomWord = wordData[Math.floor(Math.random() * wordData.length)];
+      if (randomWord && randomWord.word !== wordEntry.word && !options.includes(randomWord.word)) {
+        options.push(randomWord.word);
       }
     }
-  
+    
     // Shuffle options
-    options.sort(() => Math.random() - 0.5);
+    for (let i = options.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = options[i];
+      options[i] = options[j];
+      options[j] = temp;
+    }
   
     // Display the question
     document.getElementById('practiceQuestion').innerText = `What is the ${isSynonym ? 'synonym' : 'antonym'} of "${wordEntry.word}"?`;
@@ -728,9 +748,14 @@ function saveWord(entry) {
     // Show feedback
     if (selected === correct) {
       document.getElementById('feedback').innerText = 'Correct! 🎉';
-      priority[word].value = Math.max(0, priority[word].value - 1); // Decrease priority
+      if (priority[word]) {
+        priority[word].value = Math.max(0, priority[word].value - 1); // Decrease priority
+      }
     } else {
       document.getElementById('feedback').innerText = `Incorrect! The correct answer is: ${correct}`;
+      if (!priority[word]) {
+        priority[word] = { value: 0, lastAsked: Date.now() };
+      }
       priority[word].value += 1; // Increase priority
     }
   
@@ -738,19 +763,8 @@ function saveWord(entry) {
     const wordEntry = wordData.find(entry => entry.word === word);
     if (wordEntry && Array.isArray(wordEntry.synonyms)) {
         correctAnswerText.innerText = correct;
-        // const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wordEntry.word}`);
-        // const data = await response.json();
-        /*if (data && data.length > 0) {
-            console.log(data);
-            document.getElementById('searchResults').innerHTML = '';
-            data.forEach(entry => {
-                displaySearchResultsDefault(entry); // Display results for each entry
-            });
-        }*/
-        // console.log("WordEntry:->",wordEntry);
         meaningText.innerText = wordEntry.synonyms.join(', ');
     } else {
-      console.error('Invalid wordEntry or meanings:', wordEntry); // Debugging
       correctAnswerText.innerText = correct;
       meaningText.innerText = 'Meaning not available.';
     }
@@ -761,7 +775,11 @@ function saveWord(entry) {
     nextButton.style.display = 'block';
   
     // Update last asked timestamp
-    priority[word].lastAsked = Date.now();
+    if (!priority[word]) {
+      priority[word] = { value: 0, lastAsked: Date.now() };
+    } else {
+      priority[word].lastAsked = Date.now();
+    }
     localStorage.setItem('vocabPriority', JSON.stringify(priority));
   }
 
