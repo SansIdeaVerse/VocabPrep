@@ -2,17 +2,41 @@ let wordData = [];
 let priority = {};
 
 // Load data on page load
-window.onload = () => {
-  wordData = JSON.parse(localStorage.getItem('vocabWords')) || [];
-  priority = JSON.parse(localStorage.getItem('vocabPriority')) || {};
-  document.getElementById("TAPIKEY").value = localStorage.getItem("TAPIKEY") || "";
-  document.getElementById("DAPIKEY").value = localStorage.getItem("DAPIKEY") || "";
-  document.getElementById("OAPIKEY").value = localStorage.getItem("OAPIKEY") || "";
-  document.getElementById("OAPIID").value = localStorage.getItem("OAPIID") || "";
-  document.getElementById('dictType').value = localStorage.getItem("dictType") || "default";
-  document.getElementById('hoursSinceLastAsked').value = parseFloat(localStorage.getItem("hoursSinceLastAsked")) || 0;
-  
-};
+function loadData() {
+  try {
+    wordData = JSON.parse(localStorage.getItem('vocabWords')) || [];
+    priority = JSON.parse(localStorage.getItem('vocabPriority')) || {};
+    
+    // Load API keys if elements exist
+    const tapiKeyEl = document.getElementById("TAPIKEY");
+    const dapiKeyEl = document.getElementById("DAPIKEY");
+    const oapiKeyEl = document.getElementById("OAPIKEY");
+    const oapiIdEl = document.getElementById("OAPIID");
+    const dictTypeEl = document.getElementById('dictType');
+    const hoursEl = document.getElementById('hoursSinceLastAsked');
+    
+    if (tapiKeyEl) tapiKeyEl.value = localStorage.getItem("TAPIKEY") || "";
+    if (dapiKeyEl) dapiKeyEl.value = localStorage.getItem("DAPIKEY") || "";
+    if (oapiKeyEl) oapiKeyEl.value = localStorage.getItem("OAPIKEY") || "";
+    if (oapiIdEl) oapiIdEl.value = localStorage.getItem("OAPIID") || "";
+    if (dictTypeEl) dictTypeEl.value = localStorage.getItem("dictType") || "default";
+    if (hoursEl) hoursEl.value = parseFloat(localStorage.getItem("hoursSinceLastAsked")) || 0;
+    
+    console.log('Data loaded:', wordData.length, 'words');
+  } catch (e) {
+    console.error('Error loading data:', e);
+    wordData = [];
+    priority = {};
+  }
+}
+
+// Try both window.onload and DOMContentLoaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadData);
+} else {
+  loadData();
+}
+window.onload = loadData;
 // Function to delete dictionary total
 function deleteDict(){
   localStorage.removeItem('vocabWords');
@@ -623,15 +647,26 @@ function saveWord(entry) {
 
 // Start practice session
   function startPractice() {
-    // Reset UI
-    document.getElementById('practiceQuestion').innerText = '';
+    console.log('Starting practice, wordData length:', wordData.length);
+    
+    // Show loading state
+    document.getElementById('practiceQuestion').innerText = 'Loading...';
     document.getElementById('practiceOptions').innerHTML = '';
+    
+    // Reset UI
     document.getElementById('feedback').innerText = '';
     document.getElementById('correctAnswerDetails').style.display = 'none';
     document.getElementById('nextButton').style.display = 'none';
   
+    // Ensure wordData is loaded from localStorage
+    if (!wordData || wordData.length === 0) {
+      wordData = JSON.parse(localStorage.getItem('vocabWords')) || [];
+      priority = JSON.parse(localStorage.getItem('vocabPriority')) || {};
+    }
+    
     if (wordData.length === 0) {
-      alert('No words available for practice. Please search for some words first.');
+      document.getElementById('practiceQuestion').innerText = 'No words available!';
+      document.getElementById('practiceOptions').innerHTML = '<p>Please search for some words first in the Search tab.</p>';
       return;
     }
   
@@ -656,7 +691,8 @@ function saveWord(entry) {
     });
   
     if (wordsToPractice.length === 0) {
-      alert('No words available for practice at the moment. Try again later.');
+      document.getElementById('practiceQuestion').innerText = 'No words available!';
+      document.getElementById('practiceOptions').innerHTML = '<p>All words are on a delay. Try increasing the delay hours or wait a bit.</p>';
       return;
     }
   
@@ -672,12 +708,28 @@ function saveWord(entry) {
     }
   
     // Get the correct answer based on the question type
+    const synonyms = wordEntry.synonyms || [];
+    const antonyms = wordEntry.antonyms || [];
+    
+    // Check if we have the required data
+    if (isSynonym && synonyms.length === 0) {
+      document.getElementById('practiceQuestion').innerText = 'No synonyms!';
+      document.getElementById('practiceOptions').innerHTML = '<p>This word has no synonyms stored. Try searching for another word.</p>';
+      return;
+    }
+    if (!isSynonym && antonyms.length === 0) {
+      document.getElementById('practiceQuestion').innerText = 'No antonyms!';
+      document.getElementById('practiceOptions').innerHTML = '<p>This word has no antonyms stored. Try searching for another word or change question type.</p>';
+      return;
+    }
+  
     const correctAnswer = isSynonym
-      ? wordEntry.synonyms[Math.floor(Math.random() * wordEntry.synonyms.length)]
-      : wordEntry.antonyms[Math.floor(Math.random() * wordEntry.antonyms.length)];
+      ? synonyms[Math.floor(Math.random() * synonyms.length)]
+      : antonyms[Math.floor(Math.random() * antonyms.length)];
   
     if (!correctAnswer) {
-      alert(`No ${isSynonym ? 'synonyms' : 'antonyms'} available for this word.`);
+      document.getElementById('practiceQuestion').innerText = 'No data available!';
+      document.getElementById('practiceOptions').innerHTML = `<p>No ${isSynonym ? 'synonyms' : 'antonyms'} available for this word.</p>`;
       return;
     }
   
